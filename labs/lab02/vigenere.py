@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+ISP 2 laboratorinis darbas — Viženerio (Vigenère) šifras.
+
+1. Atšifruoti Viženerio šifrą su duotu raktu.
+2. Rasti raktą, kuris buvo naudotas šifruojant (kriptoanalizė).
+
+Naudojama abėcėlė (32 raidės):
+    aąbcčdeęėfghiįyjklmnoprsštuųūvzž
+Simboliai, nesantys abėcėlėje, lieka nepakeisti IR raktas jiems
+praleidžiamas (rakto pozicija didinama tik ties abėcėlės raidėmis).
+Didžiosios raidės įtrauktos į abėcėlę (registras išsaugomas).
+
+Naudojimas:
+    python3 vigenere.py <variantas>     # sprendžia nurodytą variantą
+    python3 vigenere.py all             # visi variantai
+"""
+import math
+import re
+import sys
+from pathlib import Path
+
+ABECELE = "aąbcčdeęėfghiįyjklmnoprsštuųūvzž"
+N = len(ABECELE)                       # 32
+DIDZIOSIOS = ABECELE.upper()
+
+INDEKSAS = {}
+for i, ch in enumerate(ABECELE):
+    INDEKSAS[ch] = i
+    INDEKSAS[DIDZIOSIOS[i]] = i
+
+
+def _vizeneris(tekstas: str, raktas: str, atsifruoti: bool) -> str:
+    """Viženerio šifras/dešifras. Raktas praleidžiamas ne abėcėlės
+    simboliams, raidžių registras išsaugomas."""
+    rakto_poslinkiai = [INDEKSAS[k] for k in raktas.lower()]
+    m = len(rakto_poslinkiai)
+    rezultatas = []
+    j = 0
+    for ch in tekstas:
+        if ch in INDEKSAS:
+            baze = ABECELE if ch.islower() else DIDZIOSIOS
+            p = rakto_poslinkiai[j % m]
+            if atsifruoti:
+                p = -p
+            rezultatas.append(baze[(INDEKSAS[ch] + p) % N])
+            j += 1                     # rakto poziciją didiname tik ties raide
+        else:
+            rezultatas.append(ch)      # ne abėcėlės simbolis — raktas praleidžiamas
+    return "".join(rezultatas)
+
+
+def sifruoti(tekstas: str, raktas: str) -> str:
+    return _vizeneris(tekstas, raktas, atsifruoti=False)
+
+
+def atsifruoti(tekstas: str, raktas: str) -> str:
+    return _vizeneris(tekstas, raktas, atsifruoti=True)
+
+
+# ----------------------------- rakto radimas -------------------------------
+
+# Apytikslis lietuvių kalbos raidžių dažnis (%).
+_DAZNIS = {
+    'i': 11.0, 'a': 10.5, 's': 7.0, 'o': 5.2, 't': 5.0, 'n': 4.8, 'e': 4.5,
+    'r': 4.3, 'k': 4.2, 'u': 4.0, 'm': 3.3, 'l': 3.2, 'p': 3.0, 'd': 2.8,
+    'v': 2.3, 'j': 2.2, 'g': 1.7, 'b': 1.6, 'ė': 1.6, 'ž': 1.3, 'y': 1.2,
+    'š': 1.2, 'č': 1.0, 'ą': 1.0, 'z': 0.9, 'ų': 0.8, 'ū': 0.8, 'ę': 0.6,
+    'į': 0.6, 'c': 0.6, 'h': 0.3, 'f': 0.2,
+}
+_GRINDYS = 0.05
+_LOG_TIK = {c: math.log(_DAZNIS.get(c, _GRINDYS) / 100.0) for c in ABECELE}
+
+
+def _srautas(sifruotas: str):
+    """Tik abėcėlės raidžių indeksų srautas (rakto pozicijos)."""
+    return [INDEKSAS[c] for c in sifruotas if c in INDEKSAS]
+
+
+def _sutapimo_indeksas(srautas, m: int) -> float:
+    """Vidutinis sutapimo indeksas (IC), kai spėjamas rakto ilgis m."""
+    ic = []
+    for stulpelis in range(m):
+        seka = srautas[stulpelis::m]
+        n = len(seka)
+        if n < 2:
+            continue
+        cnt = [0] * N
+        for x in seka:
+            cnt[x] += 1
+        ic.append(sum(c * (c - 1) for c in cnt) / (n * (n - 1)))
+    return sum(ic) / len(ic) if ic else 0.0
+
+
+def _rakto_ilgis(srautas, maks: int = 24) -> int:
+    """Rakto ilgis = tas, kuris duoda didžiausią sutapimo indeksą."""
+    return max(range(1, maks + 1), key=lambda m: _sutapimo_indeksas(srautas, m))
+
+
+def _stulpelio_poslinkis(seka) -> int:
+    """Vieno stulpelio (Cezario) rakto raidės poslinkis pagal dažnius."""
+    return max(range(N),
+               key=lambda s: sum(_LOG_TIK[ABECELE[(x - s) % N]] for x in seka))
+
+
+def _sutrumpinti(raktas: str) -> str:
+    """Jei raktas yra trumpesnio žodžio kartojimas, grąžina trumpiausią."""
+    for d in range(1, len(raktas)):
+        if len(raktas) % d == 0 and raktas[:d] * (len(raktas) // d) == raktas:
+            return raktas[:d]
+    return raktas
+
+
+def rasti_rakta(sifruotas: str) -> str:
+    """Randa Viženerio raktą kriptoanalizės būdu (IC + dažninė analizė)."""
+    srautas = _srautas(sifruotas)
+    m = _rakto_ilgis(srautas)
+    raktas = "".join(ABECELE[_stulpelio_poslinkis(srautas[c::m])] for c in range(m))
+    return _sutrumpinti(raktas)
+
+
+# ------------------------- variantų failo skaitymas -------------------------
+
+def _skaityti_varianta(kelias: Path):
+    """Grąžina (sif1, raktas1, sif2): 1 dalies šifrą su raktu ir 2 dalies šifrą."""
+    eilutes = kelias.read_text(encoding="utf-8").splitlines()
+
+    def sekcijos_pradzia(zyme: str) -> int:
+        for i, l in enumerate(eilutes):
+            if l.strip() == zyme:
+                return i
+        raise ValueError(f"Nerasta sekcija {zyme!r}")
+
+    i1 = sekcijos_pradzia("1.")
+    i2 = sekcijos_pradzia("2.")
+
+    # 1 dalis: pirma netuščia eilutė — šifras, kita netuščia — raktas
+    blokas1 = [l for l in eilutes[i1 + 1:i2] if l.strip()]
+    sif1, raktas1 = blokas1[0].strip(), blokas1[1].strip()
+
+    # 2 dalis: visas likęs tekstas po "2."
+    sif2 = "\n".join(eilutes[i2 + 1:]).strip()
+    return sif1, raktas1, sif2
+
+
+def spresti(variantas: int, aplankas: Path) -> str:
+    kelias = aplankas / f"{variantas}.txt"
+    sif1, raktas1, sif2 = _skaityti_varianta(kelias)
+
+    atsifruotas1 = atsifruoti(sif1, raktas1)
+    rastas_raktas = rasti_rakta(sif2)
+
+    return (
+        f"Variantas: {variantas}\n\n"
+        f"1. Atšifruotas tekstas (raktas „{raktas1}“):\n   {atsifruotas1}\n\n"
+        f"2. Rastas raktas: {rastas_raktas}\n"
+    )
+
+
+def main():
+    aplankas = Path(__file__).with_name("variantai")
+    arg = sys.argv[1] if len(sys.argv) > 1 else None
+    if arg == "all":
+        for v in range(1, 11):
+            try:
+                print(spresti(v, aplankas)); print("-" * 60)
+            except FileNotFoundError:
+                pass
+    elif arg and arg.isdigit():
+        print(spresti(int(arg), aplankas))
+    else:
+        raise SystemExit("Naudojimas: python3 vigenere.py <variantas|all>")
+
+
+if __name__ == "__main__":
+    main()
