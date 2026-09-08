@@ -19,7 +19,7 @@ labs/
 
 | Lab | Topic | Status |
 | --- | ----- | ------ |
-| [01](labs/lab01) | Caesar cipher (Cezaris) | Not started |
+| [01](labs/lab01) | Caesar cipher (Cezaris) | ✅ Done (variant 5) |
 | [02](labs/lab02) | Vigenère cipher (Viženeris) | Not started |
 | [03](labs/lab03) | SQL injection (SQL injekcijos) | Not started |
 | [04](labs/lab04) | Password storage (Slaptažodžių saugojimas) | Not started |

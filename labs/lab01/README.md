@@ -1,7 +1,6 @@
 # Lab 01 — Caesar cipher (Cezaris)
 
-> Done — program written and verified for all variants. Final answer sheet
-> pending your variant number.
+> ✅ Done. Variant 5. See [`atsakymas.txt`](atsakymas.txt).
 
 ## Task
 
