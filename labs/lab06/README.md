@@ -1,18 +1,21 @@
-# Lab 06
+# Lab 06 — RSA
 
-> Not started. Task PDF not yet added.
+> Not started.
 
 ## Task
 
-_Summary of the assignment goes here once `lab06.pdf` is added._
+Generate an RSA keypair from given e and 256-bit p,q; encrypt your name; break ciphertexts where m^e<n and where n has a small (40-bit) factor; decrypt an RSAES-PKCS1-v1_5 message with a given private key.
+
+Full assignment text: [`task.txt`](task.txt). Original brief: the `ISP_L6_*.pdf` in this folder.
+
+Variant = student ID number mod 10 + 1.
 
 ## Files
 
-- `lab06.pdf` — assignment brief
-
-## How to run
-
-_TBD_
+- `ISP_L6_RSA.pdf`
+- `variantai/`
+- `pagalbines_funkcijos.py`
+- `task.txt` — assignment text (transcribed)
 
 ## Notes
 

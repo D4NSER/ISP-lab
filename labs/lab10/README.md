@@ -1,18 +1,21 @@
-# Lab 10
+# Lab 10 — Block cipher modes (ECB/CBC/PCBC/CFB/OFB)
 
-> Not started. Task PDF not yet added.
+> Not started.
 
 ## Task
 
-_Summary of the assignment goes here once `lab10.pdf` is added._
+Decrypt one text encrypted under AES in ECB, CBC, PCBC, CFB and OFB modes (same key and IV), reusing the lab 9 AES implementation.
+
+Full assignment text: [`task.txt`](task.txt). Original brief: the `ISP_L10_*.pdf` in this folder.
+
+Variant = student ID number mod 10 + 1.
 
 ## Files
 
-- `lab10.pdf` — assignment brief
-
-## How to run
-
-_TBD_
+- `ISP_L10_Blokinių_šifrų_režimai.pdf`
+- `variantai/`
+- `aes_helpers.py`
+- `task.txt` — assignment text (transcribed)
 
 ## Notes
 

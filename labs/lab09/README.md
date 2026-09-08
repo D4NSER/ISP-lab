@@ -1,18 +1,21 @@
-# Lab 09
+# Lab 09 — AES (3 rounds)
 
-> Not started. Task PDF not yet added.
+> Not started.
 
 ## Task
 
-_Summary of the assignment goes here once `lab09.pdf` is added._
+Decrypt a text encrypted with 3-round AES, and encrypt your surname with 3-round AES. Round keys given (no key expansion needed).
+
+Full assignment text: [`task.txt`](task.txt). Original brief: the `ISP_L9_*.pdf` in this folder.
+
+Variant = student ID number mod 10 + 1.
 
 ## Files
 
-- `lab09.pdf` — assignment brief
-
-## How to run
-
-_TBD_
+- `ISP_L9_AES.pdf`
+- `variantai.txt`
+- `aes_helpers.py`
+- `task.txt` — assignment text (transcribed)
 
 ## Notes
 

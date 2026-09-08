@@ -1,0 +1,9 @@
+1. Prisiregistruoti https://tryhackme.com
+2. Prisijungti prie kambario https://tryhackme.com/r/room/sqlilab
+3. Jame atlikti visas 10 užduočių
+
+Pastaba. Užduotims atlikti naudosite AttackBox. Juo per parą galite naudotis tik 1 valandą. Prisijungus per VPN laikas neribojamas. Prisijungimo prie VPN instrukcija https://tryhackme.com/r/room/openvpn
+Atsiskaitymui nurodyti visų užduočių flag.
+Atsakymo pavyzdys:
+Task 2. THM{dccea429d73d4a6b4f117ac64724f460}, THM{***}, THM{***}, THM{***}
+Task 3. THM{***}

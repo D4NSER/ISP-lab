@@ -1,18 +1,20 @@
-# Lab 01
+# Lab 01 — Caesar cipher (Cezaris)
 
-> Not started. Task PDF not yet added.
+> Not started.
 
 ## Task
 
-_Summary of the assignment goes here once `lab01.pdf` is added._
+Encrypt a text with the Caesar cipher for a given shift, and decrypt a Caesar-encrypted text. Lithuanian alphabet `aąbcčdeęėfghiįyjklmnoprsštuųūvzž`; non-alphabet symbols unchanged; uppercase included.
+
+Full assignment text: [`task.txt`](task.txt). Original brief: the `ISP_L1_*.pdf` in this folder.
+
+Variant = student ID number mod 10 + 1.
 
 ## Files
 
-- `lab01.pdf` — assignment brief
-
-## How to run
-
-_TBD_
+- `ISP_L1_Cezaris.pdf`
+- `variantai.txt`
+- `task.txt` — assignment text (transcribed)
 
 ## Notes
 

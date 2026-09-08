@@ -1,18 +1,20 @@
-# Lab 02
+# Lab 02 — Vigenère cipher (Viženeris)
 
-> Not started. Task PDF not yet added.
+> Not started.
 
 ## Task
 
-_Summary of the assignment goes here once `lab02.pdf` is added._
+Decrypt a Vigenère cipher with a given key, and recover the key used for an encryption. Key skips non-alphabet symbols.
+
+Full assignment text: [`task.txt`](task.txt). Original brief: the `ISP_L2_*.pdf` in this folder.
+
+Variant = student ID number mod 10 + 1.
 
 ## Files
 
-- `lab02.pdf` — assignment brief
-
-## How to run
-
-_TBD_
+- `ISP_L2_Viženeris.pdf`
+- `variantai/`
+- `task.txt` — assignment text (transcribed)
 
 ## Notes
 

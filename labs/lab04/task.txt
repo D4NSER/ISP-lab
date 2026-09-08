@@ -1,0 +1,36 @@
+Užduotis:
+
+1. Rasti slaptažodžius užšifruotus hash'ais surengiant dictionary ataką.
+   1. MD5
+   2. SHA-256
+   3. bcrypt
+   4. scrypt (N = 2^16, r=2, p=1)
+   5. Argon2
+2. Papildoma užduotis (iki 5 balų)
+   1. Rasti bet kokią nutekintą duomenų bazę, kurioje slaptažodžiai buvo hash'uojami.
+   2. Nulaužti bent 20 slaptažodžių
+   3. Procesą aprašyti.
+
+Užduočių variantai faile variantai.zip
+variantas = studento pažymėjimo numeris mod 10 + 1
+Užduoties failo struktūra:
+
+* Algoritmo pavadinimas, hash, salt (jei buvo naudotas)
+
+MD5 ir SHA256 laužimui naudoti failą rockyou.txt. bcrypt, scrypt ir Argon2 - rockyou_1000.txt.
+Pagrindinės užduoties atsakymo įvedimo forma
+
+1. MD5 slaptažodis
+2. SHA-256 slaptažodis
+3. bcrypt slaptažodis
+4. scrypt slaptažodis
+5. Argon2 slaptažodis
+6. Programos kodas
+
+Papildomos užduoties aprašyme nurodyti:
+
+* Duomenų aprašymas (kokia įmonė, kada nutekinta, kiek slaptažodžių nutekinta ir pan.)
+* Kur radote duomenis
+* Kokiu algoritmu buvo hash'uota
+* Bent 20 slaptažodžių, kuriuos pavyko nulaužti
+* Aprašymą pateikti .docx arba .pdf formatu

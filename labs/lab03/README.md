@@ -1,18 +1,19 @@
-# Lab 03
+# Lab 03 — SQL injection (TryHackMe sqlilab)
 
-> Not started. Task PDF not yet added.
+> Not started.
 
 ## Task
 
-_Summary of the assignment goes here once `lab03.pdf` is added._
+Complete all 10 tasks of the TryHackMe `sqlilab` room and submit the flags.
+
+Full assignment text: [`task.txt`](task.txt). Original brief: the `ISP_L3_*.pdf` in this folder.
+
+Variant = student ID number mod 10 + 1.
 
 ## Files
 
-- `lab03.pdf` — assignment brief
-
-## How to run
-
-_TBD_
+- `ISP_L3_SQL_Injekcijos.pdf`
+- `task.txt` — assignment text (transcribed)
 
 ## Notes
 
