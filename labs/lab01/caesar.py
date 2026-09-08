@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+ISP 1 laboratorinis darbas — Cezario šifras.
+
+1. Užšifruoti tekstą Cezario šifru su duotu poslinkiu.
+2. Atšifruoti Cezario šifru užšifruotą tekstą (poslinkis nežinomas —
+   randamas dažninės analizės būdu).
+
+Naudojama abėcėlė (32 raidės):
+    aąbcčdeęėfghiįyjklmnoprsštuųūvzž
+Simboliai, nesantys abėcėlėje, lieka nepakeisti.
+Didžiosios raidės įtrauktos į abėcėlę (registras išsaugomas).
+
+Naudojimas:
+    python3 caesar.py <variantas>     # sprendžia nurodytą variantą
+    python3 caesar.py all             # visi variantai
+"""
+import math
+import re
+import sys
+from pathlib import Path
+
+ABECELE = "aąbcčdeęėfghiįyjklmnoprsštuųūvzž"
+N = len(ABECELE)                      # 32
+DIDZIOSIOS = ABECELE.upper()
+
+# raidė -> indeksas (ir mažosioms, ir didžiosioms)
+INDEKSAS = {}
+for i, ch in enumerate(ABECELE):
+    INDEKSAS[ch] = i
+    INDEKSAS[DIDZIOSIOS[i]] = i
+
+
+def poslinkis(tekstas: str, k: int) -> str:
+    """Pastumia kiekvieną abėcėlės raidę per k pozicijų (mod 32).
+    Ne abėcėlės simboliai nekeičiami, raidžių registras išsaugomas."""
+    rezultatas = []
+    for ch in tekstas:
+        if ch in INDEKSAS:
+            baze = ABECELE if ch.islower() else DIDZIOSIOS
+            rezultatas.append(baze[(INDEKSAS[ch] + k) % N])
+        else:
+            rezultatas.append(ch)
+    return "".join(rezultatas)
+
+
+def sifruoti(tekstas: str, raktas: int) -> str:
+    return poslinkis(tekstas, raktas)
+
+
+def atsifruoti(tekstas: str, raktas: int) -> str:
+    return poslinkis(tekstas, -raktas)
+
+
+# Apytikslis lietuvių kalbos raidžių dažnis (%). Naudojamas poslinkiui atspėti.
+_DAZNIS = {
+    'i': 11.0, 'a': 10.5, 's': 7.0, 'o': 5.2, 't': 5.0, 'n': 4.8, 'e': 4.5,
+    'r': 4.3, 'k': 4.2, 'u': 4.0, 'm': 3.3, 'l': 3.2, 'p': 3.0, 'd': 2.8,
+    'v': 2.3, 'j': 2.2, 'g': 1.7, 'b': 1.6, 'ė': 1.6, 'ž': 1.3, 'y': 1.2,
+    'š': 1.2, 'č': 1.0, 'ą': 1.0, 'z': 0.9, 'ų': 0.8, 'ū': 0.8, 'ę': 0.6,
+    'į': 0.6, 'c': 0.6, 'h': 0.3, 'f': 0.2,
+}
+_GRINDYS = 0.05                       # dažnis raidėms, kurių nėra lentelėje
+_LOG_TIK = {c: math.log(_DAZNIS.get(c, _GRINDYS) / 100.0) for c in ABECELE}
+
+
+def _tikimybe(tekstas: str) -> float:
+    """Teksto „lietuviškumo“ įvertis — raidžių log-tikimybių suma."""
+    return sum(_LOG_TIK[ch] for ch in tekstas.lower() if ch in _LOG_TIK)
+
+
+def rasti_rakta(sifruotas: str) -> int:
+    """Randa Cezario raktą (0..31), kuris atšifruoja tekstą į
+    labiausiai lietuvišką variantą."""
+    return max(range(N), key=lambda k: _tikimybe(atsifruoti(sifruotas, k)))
+
+
+# ------------------------- variantų failo skaitymas -------------------------
+
+def _skaityti_variantus(kelias: Path):
+    """Grąžina du žodynus: {var: (tekstas, poslinkis)} šifravimui ir
+    {var: sifruotas} atšifravimui."""
+    sifruoti_uzd, atsifruoti_uzd = {}, {}
+    dabartine = None
+    for eilute in kelias.read_text(encoding="utf-8").splitlines():
+        e = eilute.strip()
+        if not e:
+            continue
+        if e.lower() == "užšifruoti":
+            dabartine = "sif"; continue
+        if e.lower() == "atšifruoti":
+            dabartine = "ats"; continue
+        m = re.match(r"^(\d+)\.\s*(.*)$", e)
+        if not m or dabartine is None:
+            continue
+        nr, turinys = int(m.group(1)), m.group(2)
+        if dabartine == "sif":
+            tekstas, _, poslinkis_str = turinys.rpartition(" ")
+            sifruoti_uzd[nr] = (tekstas.strip(), int(poslinkis_str))
+        else:
+            atsifruoti_uzd[nr] = turinys.strip()
+    return sifruoti_uzd, atsifruoti_uzd
+
+
+def spresti(variantas: int, kelias: Path) -> str:
+    sif, ats = _skaityti_variantus(kelias)
+    if variantas not in sif or variantas not in ats:
+        raise SystemExit(f"Variantas {variantas} nerastas faile {kelias}")
+
+    tekstas, k = sif[variantas]
+    uzsifruotas = sifruoti(tekstas, k)
+
+    sifrograma = ats[variantas]
+    rastas_raktas = rasti_rakta(sifrograma)
+    atsifruotas = atsifruoti(sifrograma, rastas_raktas)
+
+    return (
+        f"Variantas: {variantas}\n\n"
+        f"1. Užšifruotas tekstas (poslinkis {k}):\n   {uzsifruotas}\n\n"
+        f"2. Atšifruotas tekstas (rastas poslinkis {rastas_raktas}):\n   {atsifruotas}\n"
+    )
+
+
+def main():
+    kelias = Path(__file__).with_name("variantai.txt")
+    arg = sys.argv[1] if len(sys.argv) > 1 else None
+    if arg == "all":
+        for v in range(1, 11):
+            print(spresti(v, kelias))
+            print("-" * 60)
+    elif arg and arg.isdigit():
+        print(spresti(int(arg), kelias))
+    else:
+        raise SystemExit("Naudojimas: python3 caesar.py <variantas|all>")
+
+
+if __name__ == "__main__":
+    main()
