@@ -52,3 +52,6 @@ target/
 *.out
 *.toc
 *.synctex.gz
+
+# Large wordlists — download locally, not stored in git (see labs/lab04/README.md)
+labs/lab04/rockyou.txt
