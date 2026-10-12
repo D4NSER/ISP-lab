@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-# ISP 4 lab. — slaptažodžių atkūrimas žodyno ataka
-# MD5/SHA-256: rockyou.txt;  bcrypt/scrypt/argon2: rockyou_1000.txt.  Druska: hash(pw+salt).
+"""ISP 4 lab. — slaptažodžių atkūrimas žodyno ataka.
+
+MD5/SHA-256: rockyou.txt;  bcrypt/scrypt/argon2: rockyou_1000.txt.
+Druskuotiems hash'ams tikrinama hash(slaptažodis + salt).
+"""
 import hashlib, sys
 from pathlib import Path
 import bcrypt
@@ -37,28 +40,31 @@ def argon2(enc, failas):
         try:
             if ph.verify(enc, w):
                 return w.decode("latin-1")
-        except VerificationError:   # mismatch arba dekodavimo klaida — tęsiam
+        except VerificationError:
             pass
 
 def spresti(v):
-    eilutes = [l for l in (HERE / "variantai" / f"{v}.txt").read_text().splitlines() if l.strip()]
-    out = [f"Variantas: {v}\n"]
-    for l in eilutes:
-        algo, rest = l.split(" ", 1)
-        if algo in ("MD5", "SHA-256"):                        # "hash, salt"
-            h, salt = [x.strip() for x in rest.split(",")]
-            pw = md5_sha(algo, h, salt, "rockyou.txt")
-        elif algo == "scrypt":                                # "hash, salt"
-            h, salt = [x.strip() for x in rest.split(",")]
-            pw = scrypt(h, salt, "rockyou_1000.txt")
-        elif algo == "bcrypt":                                # druska įausta hash'e
-            pw = bcrypt_(rest.strip(), "rockyou_1000.txt")
-        elif algo == "argon2":                                # druska įausta hash'e (su kableliais)
-            pw = argon2(rest.strip(), "rockyou_1000.txt")
-        else:
+    atsak = {}
+    for l in (HERE / "variantai" / f"{v}.txt").read_text().splitlines():
+        if not l.strip():
             continue
-        out.append(f"{algo} slaptažodis: {pw}")
-    return "\n".join(out)
+        algo, rest = l.split(" ", 1)
+        if algo in ("MD5", "SHA-256"):
+            h, salt = (x.strip() for x in rest.split(","))
+            atsak[algo] = md5_sha(algo, h, salt, "rockyou.txt")
+        elif algo == "scrypt":
+            h, salt = (x.strip() for x in rest.split(","))
+            atsak[algo] = scrypt(h, salt, "rockyou_1000.txt")
+        elif algo == "bcrypt":
+            atsak[algo] = bcrypt_(rest.strip(), "rockyou_1000.txt")
+        elif algo == "argon2":
+            atsak[algo] = argon2(rest.strip(), "rockyou_1000.txt")
+    return atsak
 
 if __name__ == "__main__":
-    print(spresti(int(sys.argv[1])))
+    a = spresti(int(sys.argv[1]))
+    print(f"MD5 slaptažodis: {a['MD5']}")
+    print(f"SHA-256 slaptažodis: {a['SHA-256']}")
+    print(f"bcrypt slaptažodis: {a['bcrypt']}")
+    print(f"scrypt slaptažodis: {a['scrypt']}")
+    print(f"Argon2 slaptažodis: {a['argon2']}")
