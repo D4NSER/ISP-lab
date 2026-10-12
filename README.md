@@ -22,7 +22,7 @@ labs/
 | [01](labs/lab01) | Caesar cipher (Cezaris) | ✅ Done (variant 5) |
 | [02](labs/lab02) | Vigenère cipher (Viženeris) | ✅ Done (variant 5) |
 | [03](labs/lab03) | SQL injection (SQL injekcijos) | Not started |
-| [04](labs/lab04) | Password storage (Slaptažodžių saugojimas) | Not started |
+| [04](labs/lab04) | Password storage (Slaptažodžių saugojimas) | ✅ Main task done (variant 5) |
 | [05](labs/lab05) | Multi-factor authentication (Daugiafaktorinis autentifikavimas) | Not started |
 | [06](labs/lab06) | RSA | Not started |
 | [07](labs/lab07) | Digital signatures (Skaitmeninis parašas) | Not started |

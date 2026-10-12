@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+# ISP 4 lab. — slaptažodžių atkūrimas žodyno ataka
+# MD5/SHA-256: rockyou.txt;  bcrypt/scrypt/argon2: rockyou_1000.txt.  Druska: hash(pw+salt).
+import hashlib, sys
+from pathlib import Path
+import bcrypt
+from argon2 import PasswordHasher
+from argon2.exceptions import VerificationError
+
+HERE = Path(__file__).parent
+
+def zodziai(failas):
+    return (l.rstrip(b"\r\n") for l in open(HERE / failas, "rb"))
+
+def md5_sha(algo, h, salt, failas):
+    tiks, sb = bytes.fromhex(h), salt.encode()
+    fn = hashlib.md5 if algo == "MD5" else hashlib.sha256
+    for w in zodziai(failas):
+        if fn(w + sb).digest() == tiks:
+            return w.decode("latin-1")
+
+def scrypt(h, salt, failas):
+    tiks, sb = bytes.fromhex(h), salt.encode()
+    for w in zodziai(failas):
+        if hashlib.scrypt(w, salt=sb, n=2**16, r=2, p=1, dklen=len(tiks)) == tiks:
+            return w.decode("latin-1")
+
+def bcrypt_(enc, failas):
+    e = enc.encode()
+    for w in zodziai(failas):
+        if bcrypt.checkpw(w[:72], e):
+            return w.decode("latin-1")
+
+def argon2(enc, failas):
+    ph = PasswordHasher()
+    for w in zodziai(failas):
+        try:
+            if ph.verify(enc, w):
+                return w.decode("latin-1")
+        except VerificationError:   # mismatch arba dekodavimo klaida — tęsiam
+            pass
+
+def spresti(v):
+    eilutes = [l for l in (HERE / "variantai" / f"{v}.txt").read_text().splitlines() if l.strip()]
+    out = [f"Variantas: {v}\n"]
+    for l in eilutes:
+        algo, rest = l.split(" ", 1)
+        if algo in ("MD5", "SHA-256"):                        # "hash, salt"
+            h, salt = [x.strip() for x in rest.split(",")]
+            pw = md5_sha(algo, h, salt, "rockyou.txt")
+        elif algo == "scrypt":                                # "hash, salt"
+            h, salt = [x.strip() for x in rest.split(",")]
+            pw = scrypt(h, salt, "rockyou_1000.txt")
+        elif algo == "bcrypt":                                # druska įausta hash'e
+            pw = bcrypt_(rest.strip(), "rockyou_1000.txt")
+        elif algo == "argon2":                                # druska įausta hash'e (su kableliais)
+            pw = argon2(rest.strip(), "rockyou_1000.txt")
+        else:
+            continue
+        out.append(f"{algo} slaptažodis: {pw}")
+    return "\n".join(out)
+
+if __name__ == "__main__":
+    print(spresti(int(sys.argv[1])))
