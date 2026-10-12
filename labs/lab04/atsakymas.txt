@@ -7,12 +7,6 @@ scrypt slaptažodis: manuel
 Argon2 slaptažodis: soccer
 
 Programos kodas:
-#!/usr/bin/env python3
-"""ISP 4 lab. — slaptažodžių atkūrimas žodyno ataka.
-
-MD5/SHA-256: rockyou.txt;  bcrypt/scrypt/argon2: rockyou_1000.txt.
-Druskuotiems hash'ams tikrinama hash(slaptažodis + salt).
-"""
 import hashlib, sys
 from pathlib import Path
 import bcrypt
@@ -21,8 +15,10 @@ from argon2.exceptions import VerificationError
 
 HERE = Path(__file__).parent
 
+
 def zodziai(failas):
     return (l.rstrip(b"\r\n") for l in open(HERE / failas, "rb"))
+
 
 def md5_sha(algo, h, salt, failas):
     tiks, sb = bytes.fromhex(h), salt.encode()
@@ -31,17 +27,20 @@ def md5_sha(algo, h, salt, failas):
         if fn(w + sb).digest() == tiks:
             return w.decode("latin-1")
 
+
 def scrypt(h, salt, failas):
     tiks, sb = bytes.fromhex(h), salt.encode()
     for w in zodziai(failas):
         if hashlib.scrypt(w, salt=sb, n=2**16, r=2, p=1, dklen=len(tiks)) == tiks:
             return w.decode("latin-1")
 
+
 def bcrypt_(enc, failas):
     e = enc.encode()
     for w in zodziai(failas):
         if bcrypt.checkpw(w[:72], e):
             return w.decode("latin-1")
+
 
 def argon2(enc, failas):
     ph = PasswordHasher()
@@ -51,6 +50,7 @@ def argon2(enc, failas):
                 return w.decode("latin-1")
         except VerificationError:
             pass
+
 
 def spresti(v):
     atsak = {}
@@ -70,8 +70,10 @@ def spresti(v):
             atsak[algo] = argon2(rest.strip(), "rockyou_1000.txt")
     return atsak
 
+
 if __name__ == "__main__":
-    a = spresti(int(sys.argv[1]))
+    v = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    a = spresti(v)
     print(f"MD5 slaptažodis: {a['MD5']}")
     print(f"SHA-256 slaptažodis: {a['SHA-256']}")
     print(f"bcrypt slaptažodis: {a['bcrypt']}")
